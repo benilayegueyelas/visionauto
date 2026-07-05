@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vision Auto — Services & Rental · Cincinnati, OH</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="cd"></div>
+<div id="cr"></div>
+<canvas id="c3d"></canvas>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ld-logo">
+    <svg viewBox="0 0 160 160" style="width:32px;height:32px;"><polygon points="15,10 43,10 87,148 59,148" fill="white"/><polygon points="111,10 139,10 95,148 67,148" fill="white"/><polygon points="93,10 119,10 103,64 94,64 109,38 88,38" fill="#E8671A"/></svg>
+    <span class="ld-name">VISION AUTO</span>
+  </div>
+  <div class="ld-track"><div class="ld-fill" id="ldf"></div></div>
+  <div class="ld-pct" id="ldp">0%</div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-bg" id="mBuy">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('mBuy')">✕</button>
+    <div class="modal-tag">Purchase Request · Cincinnati</div>
+    <div class="modal-title">Acquire this<br><em>Vehicle</em></div>
+    <div class="modal-sub" id="buyName">Toyota Land Cruiser V8 2024</div>
+    <form class="mform" onsubmit="event.preventDefault(); doSubmit('buy');">
+      <div class="mrow">
+        <div class="rf-g"><label class="rf-lbl">First Name</label><input class="rf-inp" id="b-fn" required placeholder="John"></div>
+        <div class="rf-g"><label class="rf-lbl">Last Name</label><input class="rf-inp" id="b-ln" required placeholder="Smith"></div>
+      </div>
+      <div class="rf-g"><label class="rf-lbl">Phone</label><input class="rf-inp" type="tel" id="b-ph" required placeholder="+1 (513) 592-1221"></div>
+      <div class="rf-g"><label class="rf-lbl">Email</label><input class="rf-inp" type="email" id="b-em" required placeholder="email@example.com"></div>
+      <div class="rf-g"><label class="rf-lbl">Message (optional)</label><input class="rf-inp" id="b-msg" placeholder="Questions or comments..."></div>
+      <div class="mbtns">
+        <button type="button" class="mbtn-cancel" onclick="closeModal('mBuy')">Cancel</button>
+        <button type="submit" class="mbtn-ok mbtn-buy">Send Request →</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-bg" id="mRent">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('mRent')">✕</button>
+    <div class="modal-tag">Rental Reservation · Cincinnati</div>
+    <div class="modal-title">Reserve this<br><em style="color:#6495ED;">Vehicle</em></div>
+    <div class="modal-sub" id="rentName">Toyota Land Cruiser V8 2024</div>
+    <form class="mform" onsubmit="event.preventDefault(); doSubmit('rent');">
+      <div class="mrow">
+        <div class="rf-g"><label class="rf-lbl">First Name</label><input class="rf-inp" id="r-fn" required placeholder="John"></div>
+        <div class="rf-g"><label class="rf-lbl">Last Name</label><input class="rf-inp" id="r-ln" required placeholder="Smith"></div>
+      </div>
+      <div class="mrow">
+        <div class="rf-g"><label class="rf-lbl">Start Date</label><input class="rf-inp" type="date" id="mds" required></div>
+        <div class="rf-g"><label class="rf-lbl">Return Date</label><input class="rf-inp" type="date" id="mde" required></div>
+      </div>
+      <div class="rf-g"><label class="rf-lbl">Pickup Location</label><input class="rf-inp" id="r-loc" required placeholder="CVG Airport, Hotel, Address..."></div>
+      <div class="rf-g"><label class="rf-lbl">Phone</label><input class="rf-inp" type="tel" id="r-ph" required placeholder="+1 (513) 592-1221"></div>
+      <div class="mbtns">
+        <button type="button" class="mbtn-cancel" onclick="closeModal('mRent')">Cancel</button>
+        <button type="submit" class="mbtn-ok mbtn-rent">Confirm Reservation →</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"><div class="toast-ico">✅</div><div class="toast-msg" id="toastMsg">Demande envoyée !</div></div>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a class="mm-link" href="#catalog"      onclick="closeMobileMenu()">Catalog</a>
+  <a class="mm-link" href="#rental"       onclick="closeMobileMenu()">Rental</a>
+  <a class="mm-link" href="#why"          onclick="closeMobileMenu()">Services</a>
+  <a class="mm-link" href="#testimonials" onclick="closeMobileMenu()">Reviews</a>
+  <div class="mm-sep"></div>
+  <button class="mm-cta" onclick="closeMobileMenu();setTimeout(()=>document.getElementById('rental').scrollIntoView({behavior:'smooth'}),300)">Reserve Now</button>
+  <div class="mm-tel">+1 (513) 592-1221</div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a class="nav-logo" href="#">
+    <svg viewBox="0 0 160 160"><polygon points="15,10 43,10 87,148 59,148" fill="white"/><polygon points="111,10 139,10 95,148 67,148" fill="white"/><polygon points="93,10 119,10 103,64 94,64 109,38 88,38" fill="#E8671A"/></svg>
+    <div style="margin-left:10px;">
+      <div class="nav-brand-name">Vision Auto</div>
+      <div class="nav-brand-sub">Services & Rental · Cincinnati, OH</div>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#catalog">Catalog</a></li>
+    <li><a href="#rental">Rental</a></li>
+    <li><a href="#why">Services</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+  </ul>
+  <div class="nav-right">
+    <span class="nav-tel">+1 (513) 592-1221</span>
+    <button class="btn-nav" onclick="document.getElementById('rental').scrollIntoView({behavior:'smooth'})"><span>Reserve</span></button>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg">
+    <img src="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=1800&q=80&fit=crop" alt="">
+    <div class="hero-bg-grad"></div>
+    <div class="hero-bg-line"></div>
+  </div>
+
+  <div class="hero-left">
+    <div class="hero-kicker" id="hk"><span class="kicker-dot"></span><span class="kicker-text">Cincinnati, Ohio · Since 2018</span></div>
+    <h1 class="hero-h1" id="hh">
+      <span>Drive</span>
+      <span><em>Excellence</em></span>
+      <span class="ghost">Redefined</span>
+    </h1>
+    <p class="hero-sub" id="hs">Buy or rent your dream vehicle in Cincinnati. A fleet of 120+ premium models, transparent pricing, and five-star service.</p>
+    <div class="hero-ctas" id="hc">
+      <button class="btn-primary" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">Explore the Fleet <span class="btn-arrow">→</span></button>
+      <button class="btn-ghost" onclick="document.getElementById('rental').scrollIntoView({behavior:'smooth'})">Reserve</button>
+    </div>
+  </div>
+
+  <div class="hero-right" id="hr">
+    <div class="hero-frame">
+      <img class="hero-frame-img" id="hfImg" src="https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=900&q=85&fit=crop" alt="">
+      <div class="hero-frame-info">
+        <div class="hfi-tag" id="hfTag">Featured This Month</div>
+        <div class="hfi-name" id="hfName">Toyota Land Cruiser V8</div>
+        <div class="hfi-specs">
+          <div class="hfi-s"><div class="hfi-sv">306</div><div class="hfi-sk">HP</div></div>
+          <div class="hfi-s" style="border-left:1px solid var(--border);border-right:1px solid var(--border);"><div class="hfi-sv">4×4</div><div class="hfi-sk">Traction</div></div>
+          <div class="hfi-s"><div class="hfi-sv">42M</div><div class="hfi-sk">USD</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-thumbs">
+      <div class="htmb on" onclick="switchCar(0)"><img src="https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=200&q=70&fit=crop" alt=""><div class="htmb-bar"></div></div>
+      <div class="htmb" onclick="switchCar(1)"><img src="https://images.unsplash.com/photo-1555215695-3004980ad54e?w=200&q=70&fit=crop" alt=""><div class="htmb-bar"></div></div>
+      <div class="htmb" onclick="switchCar(2)"><img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=200&q=70&fit=crop" alt=""><div class="htmb-bar"></div></div>
+    </div>
+  </div>
+
+  <div class="hero-stats" id="hs2">
+    <div class="hstat"><div class="hstat-n">120<span>+</span></div><div class="hstat-l">Vehicles Available</div></div>
+    <div class="hstat"><div class="hstat-n">4<span>K+</span></div><div class="hstat-l">Happy Reviews</div></div>
+    <div class="hstat"><div class="hstat-n">6<span> ans</span></div><div class="hstat-l">Years of Expertise</div></div>
+  </div>
+
+  <div class="hero-scrl" id="hscrl"><div class="scrl-track"><div class="scrl-fill"></div></div><span class="scrl-lbl">Scroll</span></div>
+</section>
+
+<!-- MODE BAR -->
+<div class="mode-bar">
+  <div class="mode-tabs">
+    <button class="mtab on" id="tA" onclick="setMode('achat')"><span>🚗</span> Buy</button>
+    <div class="mtab-div"></div>
+    <button class="mtab" id="tL" onclick="setMode('location')"><span>🔑</span> Rent</button>
+    <div class="mtab-div"></div>
+    <button class="mtab" id="tAl" onclick="setMode('all')"><span>✦</span> View All</button>
+  </div>
+</div>
+
+<!-- CATALOG -->
+<section id="catalog">
+  <div class="wrap">
+    <div class="cat-head sr">
+      <div>
+        <div class="eyebrow"><span class="eyebrow-line"></span><span class="eyebrow-txt">Our Fleet · Cincinnati</span></div>
+        <h2 class="sec-title">Vehicles<br><em>Available</em></h2>
+      </div>
+      <div class="cat-filters">
+        <button class="cf on" onclick="filterCars('all',this)">All</button>
+        <button class="cf" onclick="filterCars('achat',this)">For Sale</button>
+        <button class="cf" onclick="filterCars('location',this)">For Rent</button>
+      </div>
+    </div>
+
+    <div class="car-grid" id="carGrid">
+
+      <!-- Card 1 -->
+      <div class="car-card sr d1" data-type="both">
+        <div class="car-img">
+          <img src="https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=700&q=80&fit=crop" alt="Toyota Land Cruiser Cincinnati">
+          <div class="car-img-grad"></div>
+          <div class="cbadges"><span class="cbadge cb-b">Buy & Rent</span></div>
+          <button class="car-fav" onclick="toggleFav(this)">🤍</button>
+        </div>
+        <div class="car-body">
+          <div class="car-make">Toyota</div>
+          <div class="car-model">Land Cruiser V8</div>
+          <div class="car-trim">2024 · SUV Premium · 4×4</div>
+          <div class="car-specs">
+            <div class="cs"><div class="csv">306</div><div class="csk">HP</div></div>
+            <div class="cs"><div class="csv">4×4</div><div class="csk">Drive</div></div>
+            <div class="cs"><div class="csv">7</div><div class="csk">Seats</div></div>
+            <div class="cs"><div class="csv">Auto</div><div class="csk">Trans.</div></div>
+          </div>
+          <div class="car-pricing">
+            <div class="cp-side"><div class="cp-lbl">Purchase Price</div><div class="cp-val">$68,500</div></div>
+            <div class="cp-side" style="text-align:right;"><div class="cp-lbl">Rental/day</div><div class="cp-val-b">$140/day</div></div>
+          </div>
+          <div class="car-btns">
+            <button class="cbtn cbtn-buy" onclick="openBuy('Toyota Land Cruiser V8 2024')">Buy</button>
+            <button class="cbtn cbtn-rent" onclick="openRent('Toyota Land Cruiser V8 2024')">Rent</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="car-card sr d2" data-type="location">
+        <div class="car-img">
+          <img src="https://images.unsplash.com/photo-1555215695-3004980ad54e?w=700&q=80&fit=crop" alt="BMW Series 7 Cincinnati">
+          <div class="car-img-grad"></div>
+          <div class="cbadges"><span class="cbadge cb-r">Rental</span></div>
+          <button class="car-fav" onclick="toggleFav(this)">🤍</button>
+        </div>
+        <div class="car-body">
+          <div class="car-make">BMW</div>
+          <div class="car-model">Série 7 · 740i</div>
+          <div class="car-trim">2023 · Luxury Sedan</div>
+          <div class="car-specs">
+            <div class="cs"><div class="csv">340</div><div class="csk">HP</div></div>
+            <div class="cs"><div class="csv">RWD</div><div class="csk">Drive</div></div>
+            <div class="cs"><div class="csv">5</div><div class="csk">Seats</div></div>
+            <div class="cs"><div class="csv">Auto</div><div class="csk">Trans.</div></div>
+          </div>
+          <div class="car-pricing">
+            <div class="cp-side"><div class="cp-lbl">Purchase Price</div><div class="cp-na">Not Available</div></div>
+            <div class="cp-side" style="text-align:right;"><div class="cp-lbl">Rental/day</div><div class="cp-val-b">$155/day</div></div>
+          </div>
+          <div class="car-btns">
+            <button class="cbtn cbtn-na" disabled>Sale N/A</button>
+            <button class="cbtn cbtn-rent" onclick="openRent('BMW Series 7 740i 2023')">Rent</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="car-card sr d3" data-type="achat">
+        <div class="car-img">
+          <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=700&q=80&fit=crop" alt="Porsche Cayenne Cincinnati">
+          <div class="car-img-grad"></div>
+          <div class="cbadges"><span class="cbadge cb-s">For Sale</span></div>
+          <button class="car-fav" onclick="toggleFav(this)">🤍</button>
+        </div>
+        <div class="car-body">
+          <div class="car-make">Porsche</div>
+          <div class="car-model">Cayenne S</div>
+          <div class="car-trim">2023 · Sport SUV · AWD</div>
+          <div class="car-specs">
+            <div class="cs"><div class="csv">440</div><div class="csk">HP</div></div>
+            <div class="cs"><div class="csv">AWD</div><div class="csk">Drive</div></div>
+            <div class="cs"><div class="csv">5</div><div class="csk">Seats</div></div>
+            <div class="cs"><div class="csv">PDK</div><div class="csk">Trans.</div></div>
+          </div>
+          <div class="car-pricing">
+            <div class="cp-side"><div class="cp-lbl">Purchase Price</div><div class="cp-val">$127,000</div></div>
+            <div class="cp-side" style="text-align:right;"><div class="cp-lbl">Rental/day</div><div class="cp-na">Not Available</div></div>
+          </div>
+          <div class="car-btns">
+            <button class="cbtn cbtn-buy" onclick="openBuy('Porsche Cayenne S 2023')">Buy</button>
+            <button class="cbtn cbtn-na" disabled>Rental N/A</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="car-card sr d1" data-type="both">
+        <div class="car-img">
+          <img src="https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=700&q=80&fit=crop" alt="Range Rover Cincinnati">
+          <div class="car-img-grad"></div>
+          <div class="cbadges"><span class="cbadge cb-b">Buy & Rent</span></div>
+          <button class="car-fav" onclick="toggleFav(this)">🤍</button>
+        </div>
+        <div class="car-body">
+          <div class="car-make">Land Rover</div>
+          <div class="car-model">Range Rover Sport</div>
+          <div class="car-trim">2024 · Premium SUV · AWD</div>
+          <div class="car-specs">
+            <div class="cs"><div class="csv">395</div><div class="csk">HP</div></div>
+            <div class="cs"><div class="csv">AWD</div><div class="csk">Drive</div></div>
+            <div class="cs"><div class="csv">5</div><div class="csk">Seats</div></div>
+            <div class="cs"><div class="csv">Auto</div><div class="csk">Trans.</div></div>
+          </div>
+          <div class="car-pricing">
+            <div class="cp-side"><div class="cp-lbl">Purchase Price</div><div class="cp-val">$106,000</div></div>
+            <div class="cp-side" style="text-align:right;"><div class="cp-lbl">Rental/day</div><div class="cp-val-b">$180/day</div></div>
+          </div>
+          <div class="car-btns">
+            <button class="cbtn cbtn-buy" onclick="openBuy('Range Rover Sport 2024')">Buy</button>
+            <button class="cbtn cbtn-rent" onclick="openRent('Range Rover Sport 2024')">Rent</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="car-card sr d2" data-type="both">
+        <div class="car-img">
+          <img src="https://images.unsplash.com/photo-1617469767053-d3b523a0b982?w=700&q=80&fit=crop" alt="Mercedes GLE Cincinnati">
+          <div class="car-img-grad"></div>
+          <div class="cbadges"><span class="cbadge cb-b">Buy & Rent</span></div>
+          <button class="car-fav" onclick="toggleFav(this)">🤍</button>
+        </div>
+        <div class="car-body">
+          <div class="car-make">Mercedes-Benz</div>
+          <div class="car-model">GLE 450 AMG</div>
+          <div class="car-trim">2024 · SUV · 4MATIC</div>
+          <div class="car-specs">
+            <div class="cs"><div class="csv">367</div><div class="csk">HP</div></div>
+            <div class="cs"><div class="csv">4WD</div><div class="csk">Drive</div></div>
+            <div class="cs"><div class="csv">7</div><div class="csk">Seats</div></div>
+            <div class="cs"><div class="csv">9G</div><div class="csk">Speed</div></div>
+          </div>
+          <div class="car-pricing">
+            <div class="cp-side"><div class="cp-lbl">Purchase Price</div><div class="cp-val">$94,500</div></div>
+            <div class="cp-side" style="text-align:right;"><div class="cp-lbl">Rental/day</div><div class="cp-val-b">$147/day</div></div>
+          </div>
+          <div class="car-btns">
+            <button class="cbtn cbtn-buy" onclick="openBuy('Mercedes GLE 450 AMG 2024')">Buy</button>
+            <button class="cbtn cbtn-rent" onclick="openRent('Mercedes GLE 450 AMG 2024')">Rent</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="car-card sr d3" data-type="location">
+        <div class="car-img">
+          <img src="https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=700&q=80&fit=crop" alt="Toyota HiAce Cincinnati">
+          <div class="car-img-grad"></div>
+          <div class="cbadges"><span class="cbadge cb-r">Rental</span></div>
+          <button class="car-fav" onclick="toggleFav(this)">🤍</button>
+        </div>
+        <div class="car-body">
+          <div class="car-make">Toyota</div>
+          <div class="car-model">HiAce Granvia</div>
+          <div class="car-trim">2023 · Minibus · 15 seats</div>
+          <div class="car-specs">
+            <div class="cs"><div class="csv">190</div><div class="csk">HP</div></div>
+            <div class="cs"><div class="csv">RWD</div><div class="csk">Drive</div></div>
+            <div class="cs"><div class="csv">15</div><div class="csk">Seats</div></div>
+            <div class="cs"><div class="csv">Auto</div><div class="csk">Trans.</div></div>
+          </div>
+          <div class="car-pricing">
+            <div class="cp-side"><div class="cp-lbl">Purchase Price</div><div class="cp-na">Not Available</div></div>
+            <div class="cp-side" style="text-align:right;"><div class="cp-lbl">Rental/day</div><div class="cp-val-b">$82/day</div></div>
+          </div>
+          <div class="car-btns">
+            <button class="cbtn cbtn-na" disabled>Sale N/A</button>
+            <button class="cbtn cbtn-rent" onclick="openRent('Toyota HiAce Granvia 2023')">Rent</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="cat-more sr"><button class="btn-outline">View 114 more vehicles →</button></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span class="mq-item"><span class="mq-dot"></span>Toyota</span>
+    <span class="mq-item"><span class="mq-dot"></span>BMW</span>
+    <span class="mq-item"><span class="mq-dot"></span>Mercedes-Benz</span>
+    <span class="mq-item"><span class="mq-dot"></span>Porsche</span>
+    <span class="mq-item"><span class="mq-dot"></span>Land Rover</span>
+    <span class="mq-item"><span class="mq-dot"></span>Nissan Patrol</span>
+    <span class="mq-item"><span class="mq-dot"></span>Audi Q8</span>
+    <span class="mq-item"><span class="mq-dot"></span>Lexus LX</span>
+    <span class="mq-item"><span class="mq-dot"></span>Hyundai Palisade</span>
+    <span class="mq-item"><span class="mq-dot"></span>Toyota</span>
+    <span class="mq-item"><span class="mq-dot"></span>BMW</span>
+    <span class="mq-item"><span class="mq-dot"></span>Mercedes-Benz</span>
+    <span class="mq-item"><span class="mq-dot"></span>Porsche</span>
+    <span class="mq-item"><span class="mq-dot"></span>Land Rover</span>
+    <span class="mq-item"><span class="mq-dot"></span>Nissan Patrol</span>
+    <span class="mq-item"><span class="mq-dot"></span>Audi Q8</span>
+    <span class="mq-item"><span class="mq-dot"></span>Lexus LX</span>
+    <span class="mq-item"><span class="mq-dot"></span>Hyundai Palisade</span>
+  </div>
+</div>
+
+<!-- RENTAL -->
+<section id="rental">
+  <div class="wrap">
+    <div class="rental-grid">
+      <div>
+        <div class="sr">
+          <div class="eyebrow"><span class="eyebrow-line"></span><span class="eyebrow-txt">Rental · Cincinnati & Surroundings</span></div>
+          <h2 class="sec-title">Book in<br><em>3 Minutes</em></h2>
+          <p style="font-size:15px;color:var(--muted);line-height:1.8;margin-top:18px;max-width:420px;">Delivery to your home, hotel, or Cincinnati/Northern Kentucky Airport. Professional chauffeur included as an option.</p>
+        </div>
+        <div class="rental-form sr">
+          <div class="rf-title">Calculate <em>your rate</em></div>
+          <div class="rf-row">
+            <div class="rf-g">
+              <label class="rf-lbl">Vehicle</label>
+              <select class="rf-sel" id="rfV" onchange="calcPrice()">
+                <option value="82">Toyota HiAce — $82/day</option>
+                <option value="140">Toyota Land Cruiser — $140/day</option>
+                <option value="147">Mercedes GLE 450 — $147/day</option>
+                <option value="155">BMW Series 7 — $155/day</option>
+                <option value="180">Range Rover Sport — $180/day</option>
+              </select>
+            </div>
+            <div class="rf-g">
+              <label class="rf-lbl">Drive Type</label>
+              <select class="rf-sel">
+                <option>With Chauffeur</option>
+                <option>Self-Drive</option>
+                <option>Long-term (−15%)</option>
+              </select>
+            </div>
+          </div>
+          <div class="rf-row">
+            <div class="rf-g"><label class="rf-lbl">Start Date</label><input class="rf-inp" type="date" id="rfS" onchange="calcPrice()"></div>
+            <div class="rf-g"><label class="rf-lbl">Return Date</label><input class="rf-inp" type="date" id="rfE" onchange="calcPrice()"></div>
+          </div>
+          <div class="rf-g span2">
+            <label class="rf-lbl">Pickup Location</label>
+            <input class="rf-inp" placeholder="CVG Airport, Downtown Hotel, Address...">
+          </div>
+          <div class="rf-est">
+            <div><div class="rfe-lbl">Total Estimate</div><div class="rfe-val" id="rfT">$82</div></div>
+            <div class="rfe-days" id="rfD">1 day</div>
+          </div>
+          <button class="btn-confirm" onclick="openRent(document.getElementById('rfV').selectedOptions[0].text.split('—')[0].trim())">Confirm Reservation <span>→</span></button>
+        </div>
+      </div>
+
+      <div class="rental-right sr">
+        <div class="rent-img">
+          <img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=900&q=85&fit=crop" alt="Chauffeur Cincinnati">
+          <div class="rent-img-cap">Chauffeur service · Available 7 days/week · Cincinnati & surroundings</div>
+        </div>
+        <div class="rsteps">
+          <div class="rstep"><div class="rstep-n">01</div><div><div class="rstep-t">Choose your vehicle</div><div class="rstep-d">Browse our fleet and select the model that fits your needs and budget.</div></div></div>
+          <div class="rstep"><div class="rstep-n">02</div><div><div class="rstep-t">Set your dates and location</div><div class="rstep-d">Delivery anywhere in Cincinnati under 2 hours. Airport, hotel, or personal address.</div></div></div>
+          <div class="rstep"><div class="rstep-n">03</div><div><div class="rstep-t">Hit the road</div><div class="rstep-d">Pay on delivery or online. A Vision Auto agent will assist you every step of the way.</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="g-row">
+    <div class="g-img" style="flex:1.6;"><img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=900&q=80&fit=crop" alt="Cincinnati Ohio River"><div class="g-cap">Cincinnati · Ohio River</div></div>
+    <div class="g-img"><img src="https://images.unsplash.com/photo-1489824904134-891ab64532f1?w=600&q=80&fit=crop" alt="Intérieur luxe"><div class="g-cap">Premium Interior</div></div>
+    <div class="g-img"><img src="https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=600&q=80&fit=crop" alt="Service"><div class="g-cap">Customer Service</div></div>
+  </div>
+  <div class="g-row">
+    <div class="g-img"><img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80&fit=crop" alt="SUV"><div class="g-cap">SUV Fleet</div></div>
+    <div class="g-img" style="flex:1.4;"><img src="https://images.unsplash.com/photo-1561361058-c24cecae35ca?w=800&q=80&fit=crop" alt="Kentucky Countryside"><div class="g-cap">Kentucky Countryside</div></div>
+    <div class="g-img"><img src="https://images.unsplash.com/photo-1547744152-14d985cb937f?w=500&q=80&fit=crop" alt="Détail"><div class="g-cap">Interior Detail</div></div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section id="why">
+  <div class="wrap">
+    <div class="sr" style="text-align:center;">
+      <div class="eyebrow" style="justify-content:center;"><span class="eyebrow-line"></span><span class="eyebrow-txt">Why Choose Us</span></div>
+      <h2 class="sec-title" style="text-align:center;">Our <em>Commitment</em></h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-card sr d1"><span class="why-icon">🛡️</span><div class="why-title">12-Month Warranty</div><div class="why-desc">Every vehicle sold comes with a full one-year warranty and included maintenance at our certified partners in Cincinnati.</div><div class="why-num">01</div></div>
+      <div class="why-card sr d2"><span class="why-icon">⚡</span><div class="why-title">2-Hour Delivery</div><div class="why-desc">Your rental vehicle delivered anywhere in Cincinnati in under two hours. Available 7 days a week, 6am to midnight.</div><div class="why-num">02</div></div>
+      <div class="why-card sr d3"><span class="why-icon">💳</span><div class="why-title">Flexible Financing</div><div class="why-desc">Tailored auto credit solutions, installment payment plans, and preferential rates for long-term rentals.</div><div class="why-num">03</div></div>
+      <div class="why-card sr d4"><span class="why-icon">🔧</span><div class="why-title">Certified After-Sales</div><div class="why-desc">On-site technical workshop with certified mechanics for maintenance, inspections, and repairs of your vehicle.</div><div class="why-num">04</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="wrap">
+    <div class="sr">
+      <div class="eyebrow"><span class="eyebrow-line"></span><span class="eyebrow-txt">They Trust Us · Cincinnati</span></div>
+      <h2 class="sec-title">Client <em>Reviews</em></h2>
+    </div>
+    <div class="testi-layout">
+      <div class="sr">
+        <div class="testi-stars">
+          <svg class="tstar" viewBox="0 0 18 18"><polygon points="9,1 11.5,6.5 17.5,7.3 13,11.6 14.3,17.5 9,14.5 3.7,17.5 5,11.6 0.5,7.3 6.5,6.5" fill="#E8671A"/></svg>
+          <svg class="tstar" viewBox="0 0 18 18"><polygon points="9,1 11.5,6.5 17.5,7.3 13,11.6 14.3,17.5 9,14.5 3.7,17.5 5,11.6 0.5,7.3 6.5,6.5" fill="#E8671A"/></svg>
+          <svg class="tstar" viewBox="0 0 18 18"><polygon points="9,1 11.5,6.5 17.5,7.3 13,11.6 14.3,17.5 9,14.5 3.7,17.5 5,11.6 0.5,7.3 6.5,6.5" fill="#E8671A"/></svg>
+          <svg class="tstar" viewBox="0 0 18 18"><polygon points="9,1 11.5,6.5 17.5,7.3 13,11.6 14.3,17.5 9,14.5 3.7,17.5 5,11.6 0.5,7.3 6.5,6.5" fill="#E8671A"/></svg>
+          <svg class="tstar" viewBox="0 0 18 18"><polygon points="9,1 11.5,6.5 17.5,7.3 13,11.6 14.3,17.5 9,14.5 3.7,17.5 5,11.6 0.5,7.3 6.5,6.5" fill="#E8671A"/></svg>
+        </div>
+        <p class="testi-quote">"Exceptional service. Land Cruiser delivered to the Marriott in under an hour. Perfect condition, professional and punctual chauffeur."</p>
+        <div class="testi-auth"><div class="tav">OM</div><div><div class="ta-name">Ousmane Mbaye</div><div class="ta-role">Project Director · Cincinnati, OH</div></div></div>
+      </div>
+      <div class="testi-list sr">
+        <div class="titem"><div class="tav-sm">FD</div><div><div class="t-stars-sm">★★★★★</div><p class="t-text">"I bought my Range Rover Sport here. Transparent process, zero surprises. The team guided me from A to Z on financing."</p><div class="t-meta">Fatou Smith · Sales Director · Cincinnati, OH</div></div></div>
+        <div class="titem"><div class="tav-sm">IB</div><div><div class="t-stars-sm">★★★★★</div><p class="t-text">"Fleet of 5 vehicles on long-term rental for our company. Clear contracts, maintenance guaranteed. Vision Auto is our official partner."</p><div class="t-meta">Ibrahima Ba · CEO · Cincinnati Logistics</div></div></div>
+        <div class="titem"><div class="tav-sm">AS</div><div><div class="t-stars-sm">★★★★★</div><p class="t-text">"BMW Series 7 to welcome an important client. Delivered clean, full tank, with a suited chauffeur. Flawless impression."</p><div class="t-meta">Abdoulaye Sow · Architect · Hyde Park, Cincinnati</div></div></div>
+        <div class="titem"><div class="tav-sm">AM</div><div><div class="t-stars-sm">★★★★☆</div><p class="t-text">"HiAce minibus for our company seminar in Lexington. Pickup in Cincinnati, return in the evening. Everything went perfectly."</p><div class="t-meta">Aminata Mbodj · Event Manager · Downtown Cincinnati</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="cta-bg">
+    <img src="https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=1800&q=80&fit=crop" alt="">
+    <div class="cta-bg-grad"></div>
+  </div>
+  <div class="cta-content">
+    <div class="eyebrow sr" style="justify-content:center;"><span class="eyebrow-line"></span><span class="eyebrow-txt">Take Action · Cincinnati</span></div>
+    <h2 class="cta-title sr">Your<br><em>Vehicle</em><br>is Waiting</h2>
+    <p class="cta-sub sr">Over 120 premium vehicles available today in Cincinnati. Buy or rent — the choice is yours.</p>
+    <div class="cta-btns sr">
+      <button class="btn-primary" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">Explore the Fleet <span class="btn-arrow">→</span></button>
+      <button class="btn-ghost" onclick="openRent('votre véhicule')">Reserve Now</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="nav-logo">
+        <svg style="width:26px;height:26px;" viewBox="0 0 160 160"><polygon points="15,10 43,10 87,148 59,148" fill="white"/><polygon points="111,10 139,10 95,148 67,148" fill="white"/><polygon points="93,10 119,10 103,64 94,64 109,38 88,38" fill="#E8671A"/></svg>
+        <div style="margin-left:10px;"><div class="nav-brand-name">Vision Auto</div><div class="nav-brand-sub">Services & Rental · Cincinnati, OH</div></div>
+      </div>
+      <p>Your trusted automotive partner in Cincinnati, Ohio since 2018. Buying, renting, and servicing premium vehicles across the Midwest.</p>
+      <div class="footer-social">
+        <a class="fsoc" href="#">𝕏</a>
+        <a class="fsoc" href="#">f</a>
+        <a class="fsoc" href="#">📸</a>
+        <a class="fsoc" href="#">in</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-ttl">Services</div>
+      <ul class="footer-links">
+        <li><a href="#">Vehicle Sales</a></li>
+        <li><a href="#">Short-term Rental</a></li>
+        <li><a href="#">Long-term Rental</a></li>
+        <li><a href="#">With Chauffeur</a></li>
+        <li><a href="#">Maintenance & After-Sales</a></li>
+        <li><a href="#">Auto Financing</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-ttl">Information</div>
+      <ul class="footer-links">
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Our Fleet</a></li>
+        <li><a href="#">Testimonials</a></li>
+        <li><a href="#">Blog & Tips</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Partners</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-ttl">Contact Us</div>
+      <ul class="footer-links">
+        <li><a href="#">📍 Cincinnati, Ohio 45202</a></li>
+        <li><a href="#">📞 +1 (513) 592-1221</a></li>
+        <li><a href="#">📞 +1 (513) 592-1221</a></li>
+        <li><a href="#">✉️ contact@visionauto.com</a></li>
+        <li><a href="#">⏰ Mon–Sat · 7am–10pm</a></li>
+        <li><a href="#">🚗 Sun · 9am–6pm</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 Vision Auto Services & Rental · Cincinnati, OH, Ohio · All droits réservés</div>
+    <div class="footer-loc"><span class="fdot"></span>Proudly based in Cincinnati, Ohio 🇺🇸</div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
